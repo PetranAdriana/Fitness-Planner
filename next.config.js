@@ -1,11 +1,6 @@
 module.exports = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn-exercisedb.vercel.app',
-        pathname: '/api/v1/images/**',
-      },
-    ],
+    domains: ["exercisedb.p.rapidapi.com"],
+    unoptimized: true, // Opțional, dacă folosești imagini de tip GIF
   },
 };
