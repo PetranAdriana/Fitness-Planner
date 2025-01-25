@@ -1,30 +1,139 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import ExercisesList from "@/components/exercises/exercises-list";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-async function getExercises() {
-  try {
-    const res = await fetch("http://localhost:3000/api/exercises", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+export default function ExercisesPage() {
+  const [exercises, setExercises] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 12,
+  });
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch exercises");
+  const fetchExercises = async (page = 1) => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        `/api/exercises?page=${page}&limit=${pagination.itemsPerPage}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch exercises");
+      const data = await res.json();
+      setExercises(data.exercises);
+      setPagination(data.pagination);
+    } catch (error) {
+      console.error("Error fetching exercises:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExercises();
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchExercises(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, pagination.currentPage - 2);
+    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    const exercises = await res.json();
-    console.log("exercises:", exercises);
+    // Previous button
+    items.push(
+      <PaginationItem key="prev">
+        <PaginationPrevious
+          onClick={() => handlePageChange(pagination.currentPage - 1)}
+          className={pagination.currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+        />
+      </PaginationItem>
+    );
 
-    return exercises;
-  } catch (error) {
-    console.error("Error fetching exercises:", error);
-    return []; // Return empty array on error
-  }
-}
+    // First page
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
 
-export default async function ExercisesPage() {
-  const exercises = await getExercises();
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => handlePageChange(i)}
+            isActive={pagination.currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    // Last page
+    if (endPage < pagination.totalPages) {
+      if (endPage < pagination.totalPages - 1) {
+        items.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      items.push(
+        <PaginationItem key={pagination.totalPages}>
+          <PaginationLink onClick={() => handlePageChange(pagination.totalPages)}>
+            {pagination.totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    // Next button
+    items.push(
+      <PaginationItem key="next">
+        <PaginationNext
+          onClick={() => handlePageChange(pagination.currentPage + 1)}
+          className={
+            pagination.currentPage === pagination.totalPages
+              ? "pointer-events-none opacity-50"
+              : "cursor-pointer"
+          }
+        />
+      </PaginationItem>
+    );
+
+    return items;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -34,12 +143,24 @@ export default async function ExercisesPage() {
             Exercise Library
           </h1>
           <p className="text-lg text-gray-600">
-            Browse through our collection of exercises and find the perfect ones
-            for your workout
+            Browse through our collection of exercises
           </p>
         </div>
 
-        <ExercisesList initialExercises={exercises} />
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : (
+          <>
+            <ExercisesList initialExercises={exercises} />
+            <div className="mt-12">
+              <Pagination>
+                <PaginationContent>{renderPaginationItems()}</PaginationContent>
+              </Pagination>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
