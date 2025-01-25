@@ -151,7 +151,10 @@ export default function ExercisesPage() {
           <h1 className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-4">
             Exercise Library
           </h1>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p
+            className="relative w-[max-content] mx-auto font-mono text-xl text-neutral-600 dark:text-neutral-300 mb-12
+            before:absolute before:inset-0 before:animate-typewriter before:bg-background"
+          >
             Browse through our collection of exercises and find the perfect ones
             for your workout routine
           </p>

@@ -8,9 +8,9 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold text-primary-600 dark:text-primary-400 mb-6">
             Welcome to Fitness Planner
           </h1>
-          <p className="text-xl text-neutral-600 dark:text-neutral-300 mb-12">
-            Your personal fitness companion for tracking workouts and achieving
-            your goals
+          <p className="relative w-[max-content] mx-auto font-mono text-xl text-neutral-600 dark:text-neutral-300 mb-12
+            before:absolute before:inset-0 before:animate-typewriter before:bg-background">
+            Your personal fitness companion for tracking workouts and achieving your goals
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
