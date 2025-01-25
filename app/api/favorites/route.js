@@ -1,21 +1,17 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-// In a real app, this would be stored in a database
 let userFavorites = new Map();
 
 export async function GET() {
   try {
-    const authToken = cookies().get("authToken");
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get("authToken");
+
     if (!authToken) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // In a real app, we would use the token to get the user's ID
-    // For now, we'll use the token value as the user ID
     const userId = authToken.value;
     const favorites = userFavorites.get(userId) || [];
 
@@ -31,12 +27,11 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const authToken = cookies().get("authToken");
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get("authToken");
+
     if (!authToken) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = authToken.value;
@@ -50,9 +45,8 @@ export async function POST(request) {
     }
 
     let userFavoritesList = userFavorites.get(userId) || [];
-    
-    // Check if exercise is already in favorites
-    if (!userFavoritesList.some(fav => fav.id === exercise.id)) {
+
+    if (!userFavoritesList.some((fav) => fav.id === exercise.id)) {
       userFavoritesList = [...userFavoritesList, exercise];
       userFavorites.set(userId, userFavoritesList);
     }
@@ -69,12 +63,11 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
-    const authToken = cookies().get("authToken");
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get("authToken");
+
     if (!authToken) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = authToken.value;
@@ -89,7 +82,7 @@ export async function DELETE(request) {
 
     let userFavoritesList = userFavorites.get(userId) || [];
     userFavoritesList = userFavoritesList.filter(
-      exercise => exercise.id !== exerciseId
+      (exercise) => exercise.id !== exerciseId
     );
     userFavorites.set(userId, userFavoritesList);
 

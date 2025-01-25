@@ -6,11 +6,15 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 
-export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
+const Navbar = () => {
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
+
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   const isLinkActive = (href) => {
     return pathname === href;
@@ -19,9 +23,9 @@ export default function Navbar() {
   const linkClasses = (href) => {
     return `${
       isLinkActive(href)
-        ? "bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600"
-        : "text-gray-700 hover:text-indigo-600"
-    } px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200`;
+        ? "text-primary-100"
+        : "text-white hover:text-primary-100 transition-colors"
+    }`;
   };
 
   useEffect(() => {
@@ -55,35 +59,61 @@ export default function Navbar() {
     }
   };
 
-  return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
-              <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Fitness Planner
-              </span>
-            </Link>
-          </div>
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-          {/* Desktop Menu */}
-          <div className="hidden sm:flex sm:items-center sm:space-x-4">
-            <Link href="/exercises" className={linkClasses("/exercises")}>
+  return (
+    <nav className="navbar fixed w-full top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="relative flex items-center justify-between h-16">
+          {/* Logo and Brand */}
+          <Link href="/" className="flex items-center gap-8">
+            <Logo />
+            <span className="text-xl font-bold text-white hover:text-primary-100">
+              Fitness Planner
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/"
+              className={`hover:text-primary-100 transition-colors ${
+                pathname === "/" ? "text-primary-100" : "text-white"
+              }`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/exercises"
+              className={`hover:text-primary-100 transition-colors ${
+                pathname === "/exercises" ? "text-primary-100" : "text-white"
+              }`}
+            >
               Exercises
             </Link>
             {isLoggedIn && (
               <>
-                <Link href="/favorites" className={linkClasses("/favorites")}>
+                <Link
+                  href="/favorites"
+                  className={`hover:text-primary-100 transition-colors ${
+                    pathname === "/favorites"
+                      ? "text-primary-100"
+                      : "text-white"
+                  }`}
+                >
                   Favorites
                 </Link>
-                <Link href="/profile" className={linkClasses("/profile")}>
+                <Link
+                  href="/profile"
+                  className={`hover:text-primary-100 transition-colors ${
+                    pathname === "/profile" ? "text-primary-100" : "text-white"
+                  }`}
+                >
                   Profile
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="text-gray-700 hover:text-indigo-600 hover:bg-red-300 px-3 py-2 rounded-lg text-sm font-medium"
+                  className="text-white hover:text-primary-100 transition-colors"
                 >
                   Sign Out
                 </button>
@@ -92,18 +122,19 @@ export default function Navbar() {
             {!isLoggedIn && (
               <Link
                 href="/login"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                className="text-white hover:text-primary-100 transition-colors"
               >
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="sm:hidden flex items-center">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-indigo-600 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-primary-100 hover:bg-primary-700 focus:outline-none"
+              aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
               {!isMenuOpen ? (
@@ -140,16 +171,33 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
+        {/* Mobile Menu */}
+        <div
+          className={`md:hidden ${
+            isMenuOpen
+              ? "max-h-64 opacity-100 visible"
+              : "max-h-0 opacity-0 invisible"
+          } transition-all duration-200 ease-in-out overflow-hidden`}
+        >
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link
+              href="/"
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                pathname === "/"
+                  ? "bg-primary-700 text-white"
+                  : "text-white hover:bg-primary-700 hover:text-white"
+              }`}
+            >
+              Home
+            </Link>
             <Link
               href="/exercises"
-              className={`block ${linkClasses("/exercises")}`}
-              onClick={() => setIsMenuOpen(false)}
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                pathname === "/exercises"
+                  ? "bg-primary-700 text-white"
+                  : "text-white hover:bg-primary-700 hover:text-white"
+              }`}
             >
               Exercises
             </Link>
@@ -157,24 +205,27 @@ export default function Navbar() {
               <>
                 <Link
                   href="/favorites"
-                  className={`block ${linkClasses("/favorites")}`}
-                  onClick={() => setIsMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    pathname === "/favorites"
+                      ? "bg-primary-700 text-white"
+                      : "text-white hover:bg-primary-700 hover:text-white"
+                  }`}
                 >
                   Favorites
                 </Link>
                 <Link
                   href="/profile"
-                  className={`block ${linkClasses("/profile")}`}
-                  onClick={() => setIsMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                    pathname === "/profile"
+                      ? "bg-primary-700 text-white"
+                      : "text-white hover:bg-primary-700 hover:text-white"
+                  }`}
                 >
                   Profile
                 </Link>
                 <button
-                  onClick={() => {
-                    handleSignOut();
-                    setIsMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+                  onClick={handleSignOut}
+                  className="block px-3 py-2 rounded-md text-base font-medium transition-colors text-white hover:bg-primary-700 hover:text-white"
                 >
                   Sign Out
                 </button>
@@ -183,15 +234,16 @@ export default function Navbar() {
             {!isLoggedIn && (
               <Link
                 href="/login"
-                className="block px-3 py-2 text-base font-medium text-indigo-600"
-                onClick={() => setIsMenuOpen(false)}
+                className="block px-3 py-2 rounded-md text-base font-medium transition-colors text-white hover:bg-primary-700 hover:text-white"
               >
                 Sign In
               </Link>
             )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
-}
+};
+
+export default Navbar;
