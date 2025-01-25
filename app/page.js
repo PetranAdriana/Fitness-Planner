@@ -2,23 +2,24 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-8">
+    <main className="min-h-screen bg-background pt-32">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-primary-600 dark:text-primary-400 mb-6">
             Welcome to Fitness Planner
           </h1>
-          <p className="text-xl text-gray-600 mb-12">
-            Your personal fitness companion for tracking workouts and achieving your goals
+          <p className="text-xl text-neutral-600 dark:text-neutral-300 mb-12">
+            Your personal fitness companion for tracking workouts and achieving
+            your goals
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Exercise Library Card */}
-            <Link href="/exercises" className="group">
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
-                <div className="w-16 h-16 mx-auto mb-6 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+            <Link href="/exercises" className="block group">
+              <div className="h-full bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-border">
+                <div className="w-14 h-14 mx-auto mb-4 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <svg
-                    className="w-8 h-8 text-indigo-600"
+                    className="w-7 h-7 text-primary-600 dark:text-primary-300"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -32,19 +33,22 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Exercise Library</h3>
-                <p className="text-gray-600">
-                  Browse through our collection of exercises and find the perfect ones for your workout
+                <h3 className="text-lg font-semibold text-primary-700 dark:text-primary-300 mb-2">
+                  Exercise Library
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-300 text-sm">
+                  Browse through our collection of exercises and find the
+                  perfect ones for your workout
                 </p>
               </div>
             </Link>
 
             {/* Favorites Card */}
-            <Link href="/favorites" className="group">
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
-                <div className="w-16 h-16 mx-auto mb-6 bg-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+            <Link href="/favorites" className="block group">
+              <div className="h-full bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-border">
+                <div className="w-14 h-14 mx-auto mb-4 bg-accent-100 dark:bg-accent-900 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <svg
-                    className="w-8 h-8 text-purple-600"
+                    className="w-7 h-7 text-accent-600 dark:text-accent-300"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -58,19 +62,22 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">My Favorites</h3>
-                <p className="text-gray-600">
-                  Access your favorite exercises and create personalized workout routines
+                <h3 className="text-lg font-semibold text-primary-700 dark:text-primary-300 mb-2">
+                  My Favorites
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-300 text-sm">
+                  Access your favorite exercises and create personalized workout
+                  routines
                 </p>
               </div>
             </Link>
 
             {/* Profile Card */}
-            <Link href="/profile" className="group">
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
-                <div className="w-16 h-16 mx-auto mb-6 bg-pink-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+            <Link href="/profile" className="block group">
+              <div className="h-full bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-border">
+                <div className="w-14 h-14 mx-auto mb-4 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <svg
-                    className="w-8 h-8 text-pink-600"
+                    className="w-7 h-7 text-primary-600 dark:text-primary-300"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -84,15 +91,18 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">My Profile</h3>
-                <p className="text-gray-600">
-                  View and update your profile settings and track your fitness progress
+                <h3 className="text-lg font-semibold text-primary-700 dark:text-primary-300 mb-2">
+                  My Profile
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-300 text-sm">
+                  View and update your profile settings and track your fitness
+                  progress
                 </p>
               </div>
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

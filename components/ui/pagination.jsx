@@ -32,9 +32,9 @@ const PaginationLink = ({ className, isActive, ...props }) => (
   <button
     aria-current={isActive ? "page" : undefined}
     className={cn(
-      "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-colors hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-600",
-      isActive && "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 hover:text-white",
-      !isActive && "text-gray-500",
+      "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-colors hover:bg-neutral-200",
+      isActive && "bg-primary-600 text-white hover:bg-primary-700",
+      !isActive && "text-neutral-700",
       className
     )}
     {...props}
@@ -50,7 +50,7 @@ const PaginationPrevious = ({
     aria-label="Go to previous page"
     size="default"
     className={cn(
-      "gap-1 pl-2.5 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50",
+      "gap-1 pl-2.5 hover:bg-neutral-200",
       className
     )}
     {...props}
@@ -69,7 +69,7 @@ const PaginationNext = ({
     aria-label="Go to next page"
     size="default"
     className={cn(
-      "gap-1 pr-2.5 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50",
+      "gap-1 pr-2.5 hover:bg-neutral-200",
       className
     )}
     {...props}
@@ -89,7 +89,7 @@ const PaginationEllipsis = ({
     className={cn("flex h-9 w-9 items-center justify-center", className)}
     {...props}
   >
-    <MoreHorizontal className="h-4 w-4 text-gray-400" />
+    <MoreHorizontal className="h-4 w-4 text-neutral-400" />
     <span className="sr-only">More pages</span>
   </span>
 );

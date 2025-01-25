@@ -54,7 +54,10 @@ export default function ExercisesPage() {
     const items = [];
     const maxVisiblePages = 5;
     let startPage = Math.max(1, pagination.currentPage - 2);
-    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+    let endPage = Math.min(
+      pagination.totalPages,
+      startPage + maxVisiblePages - 1
+    );
 
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -65,7 +68,11 @@ export default function ExercisesPage() {
       <PaginationItem key="prev">
         <PaginationPrevious
           onClick={() => handlePageChange(pagination.currentPage - 1)}
-          className={pagination.currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+          className={
+            pagination.currentPage === 1
+              ? "pointer-events-none opacity-50"
+              : "cursor-pointer"
+          }
         />
       </PaginationItem>
     );
@@ -111,7 +118,9 @@ export default function ExercisesPage() {
       }
       items.push(
         <PaginationItem key={pagination.totalPages}>
-          <PaginationLink onClick={() => handlePageChange(pagination.totalPages)}>
+          <PaginationLink
+            onClick={() => handlePageChange(pagination.totalPages)}
+          >
             {pagination.totalPages}
           </PaginationLink>
         </PaginationItem>
@@ -136,25 +145,26 @@ export default function ExercisesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+    <main className="min-h-screen bg-background pt-32">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <h1 className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-4">
             Exercise Library
           </h1>
-          <p className="text-lg text-gray-600">
-            Browse through our collection of exercises
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+            Browse through our collection of exercises and find the perfect ones
+            for your workout routine
           </p>
         </div>
 
         {isLoading ? (
           <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 dark:border-primary-400"></div>
           </div>
         ) : (
           <>
             <ExercisesList initialExercises={exercises} />
-            <div className="mt-12">
+            <div className="mt-12 mb-8">
               <Pagination>
                 <PaginationContent>{renderPaginationItems()}</PaginationContent>
               </Pagination>
@@ -162,6 +172,6 @@ export default function ExercisesPage() {
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }
