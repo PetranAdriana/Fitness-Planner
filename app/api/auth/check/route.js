@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const authToken = cookies().get("authToken");
+    const authToken = (await cookies()).get("authToken");
     const isAuthenticated = !!authToken;
 
     if (isAuthenticated) {

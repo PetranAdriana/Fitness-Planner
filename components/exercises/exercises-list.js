@@ -3,10 +3,22 @@
 import { useState } from "react";
 import Image from "next/image";
 import ExerciseModal from "./exercise-modal";
+import SearchBar from "./search-bar";
 
 export default function ExercisesList({ initialExercises = [] }) {
   const [exercises] = useState(initialExercises);
   const [selectedExercise, setSelectedExercise] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredExercises = exercises.filter((exercise) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      exercise.name.toLowerCase().includes(searchLower) ||
+      exercise.target.toLowerCase().includes(searchLower) ||
+      exercise.equipment.toLowerCase().includes(searchLower) ||
+      exercise.bodyPart.toLowerCase().includes(searchLower)
+    );
+  });
 
   if (!exercises.length) {
     return (
@@ -18,8 +30,13 @@ export default function ExercisesList({ initialExercises = [] }) {
 
   return (
     <>
+      <SearchBar 
+        value={searchQuery}
+        onChange={setSearchQuery}
+        onSubmit={(e) => e.preventDefault()}
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {exercises.map((exercise) => (
+        {filteredExercises.map((exercise) => (
           <div
             key={exercise.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1"
