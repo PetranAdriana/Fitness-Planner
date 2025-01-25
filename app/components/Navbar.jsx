@@ -3,12 +3,26 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Logo from './Logo';
+import { usePathname } from "next/navigation";
+import Logo from "./Logo";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isLinkActive = (href) => {
+    return pathname === href;
+  };
+
+  const linkClasses = (href) => {
+    return `${
+      isLinkActive(href)
+        ? "bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600"
+        : "text-gray-700 hover:text-indigo-600"
+    } px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200`;
+  };
 
   useEffect(() => {
     checkLoginStatus();
@@ -56,29 +70,20 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:items-center sm:space-x-4">
-            <Link
-              href="/exercises"
-              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-lg text-sm font-medium"
-            >
+            <Link href="/exercises" className={linkClasses("/exercises")}>
               Exercises
             </Link>
             {isLoggedIn && (
               <>
-                <Link
-                  href="/favorites"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-lg text-sm font-medium"
-                >
+                <Link href="/favorites" className={linkClasses("/favorites")}>
                   Favorites
                 </Link>
-                <Link
-                  href="/profile"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-lg text-sm font-medium"
-                >
+                <Link href="/profile" className={linkClasses("/profile")}>
                   Profile
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-lg text-sm font-medium"
+                  className="text-gray-700 hover:text-indigo-600 hover:bg-red-300 px-3 py-2 rounded-lg text-sm font-medium"
                 >
                   Sign Out
                 </button>
@@ -143,7 +148,7 @@ export default function Navbar() {
           <div className="pt-2 pb-3 space-y-1">
             <Link
               href="/exercises"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+              className={`block ${linkClasses("/exercises")}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Exercises
@@ -152,14 +157,14 @@ export default function Navbar() {
               <>
                 <Link
                   href="/favorites"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+                  className={`block ${linkClasses("/favorites")}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Favorites
                 </Link>
                 <Link
                   href="/profile"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+                  className={`block ${linkClasses("/profile")}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
