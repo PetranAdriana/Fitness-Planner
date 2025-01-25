@@ -31,7 +31,9 @@ export default function ExercisesList({ initialExercises = [] }) {
   if (!exercises.length) {
     return (
       <div className="text-center py-12">
-        <p className="text-neutral-600 dark:text-neutral-400">No exercises found.</p>
+        <p className="text-neutral-600 dark:text-neutral-400">
+          No exercises found.
+        </p>
       </div>
     );
   }
@@ -59,7 +61,7 @@ export default function ExercisesList({ initialExercises = [] }) {
               />
             </div>
             <CardHeader className="space-y-2">
-              <CardTitle className="group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+              <CardTitle className="group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors uppercase">
                 {exercise.name}
               </CardTitle>
               <CardDescription className="capitalize">
