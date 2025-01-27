@@ -1,12 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import ExerciseModal from "../exercises/exercise-modal";
+import useStore from "@/lib/store";
 
-export default function FavoritesList({ favorites = [], onFavoriteRemoved }) {
+export default function FavoritesList({ favorites: initialFavorites = [] }) {
+  const [favorites, setFavorites] = useState(initialFavorites);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [deletingIds, setDeletingIds] = useState(new Set());
+  const refreshFavorites = useStore((state) => state.refreshFavorites);
+
+  useEffect(() => {
+    const loadFavorites = async () => {
+      const updatedFavorites = await refreshFavorites();
+      setFavorites(updatedFavorites);
+    };
+    loadFavorites();
+  }, [refreshFavorites]);
 
   const handleRemoveFavorite = async (exerciseId) => {
     if (deletingIds.has(exerciseId)) return;
@@ -26,9 +37,8 @@ export default function FavoritesList({ favorites = [], onFavoriteRemoved }) {
         throw new Error("Failed to remove from favorites");
       }
 
-      if (onFavoriteRemoved) {
-        onFavoriteRemoved(exerciseId);
-      }
+      const updatedFavorites = await refreshFavorites();
+      setFavorites(updatedFavorites);
     } catch (error) {
       console.error("Error removing from favorites:", error);
     } finally {

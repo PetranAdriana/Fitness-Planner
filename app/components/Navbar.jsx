@@ -9,6 +9,7 @@ import Logo from "./Logo";
 const Navbar = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   // Close menu when route changes
@@ -30,7 +31,7 @@ const Navbar = () => {
 
   useEffect(() => {
     checkLoginStatus();
-  }, []);
+  }, [pathname]);
 
   const checkLoginStatus = async () => {
     try {
@@ -58,8 +59,6 @@ const Navbar = () => {
       console.error("Error signing out:", error);
     }
   };
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <nav className="navbar fixed w-full top-0 z-50">

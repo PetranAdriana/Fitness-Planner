@@ -64,7 +64,7 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {/* Test Account Notice */}
-            <div className="rounded-md bg-blue-50 p-4">
+            {/* <div className="rounded-md bg-blue-50 p-4">
               <div className="flex">
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-blue-800">
@@ -76,7 +76,7 @@ export default function LoginPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label
@@ -123,14 +123,12 @@ export default function LoginPage() {
 
           {error && (
             <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Error signing in
-                  </h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{error}</p>
-                  </div>
+              <div className="flex flex-col justify-center items-center">
+                <h3 className="text-sm font-medium text-red-800">
+                  Error signing in
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
                 </div>
               </div>
             </div>

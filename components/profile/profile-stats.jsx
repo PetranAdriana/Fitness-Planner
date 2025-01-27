@@ -1,6 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
+import useStore from "@/lib/store";
+
 export default function ProfileStats({ stats }) {
+  const favoritesCount = useStore((state) => state.favoritesCount);
+  const refreshFavorites = useStore((state) => state.refreshFavorites);
+
+  useEffect(() => {
+    refreshFavorites();
+  }, [refreshFavorites]);
+
   return (
     <div className="bg-card p-6 rounded-lg border border-border">
       <div className="flex items-center gap-3">
@@ -18,7 +28,7 @@ export default function ProfileStats({ stats }) {
             Favorite Exercises
           </h3>
           <p className="text-3xl font-semibold text-primary-600 dark:text-primary-400">
-            {stats?.favoriteExercises || 0}
+            {favoritesCount}
           </p>
         </div>
       </div>

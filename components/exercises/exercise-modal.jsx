@@ -8,18 +8,18 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import useStore from "@/lib/store";
 
 export default function ExerciseModal({ exercise, isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const refreshFavorites = useStore((state) => state.refreshFavorites);
 
   useEffect(() => {
     // Check if exercise is in favorites when modal opens
     const checkFavoriteStatus = async () => {
       try {
-        const res = await fetch("/api/favorites");
-        if (!res.ok) return;
-        const favorites = await res.json();
+        const favorites = await refreshFavorites();
         setIsFavorite(favorites.some(fav => fav.id === exercise?.id));
       } catch (error) {
         console.error("Error checking favorite status:", error);
@@ -29,7 +29,7 @@ export default function ExerciseModal({ exercise, isOpen, onClose }) {
     if (exercise && isOpen) {
       checkFavoriteStatus();
     }
-  }, [exercise, isOpen]);
+  }, [exercise, isOpen, refreshFavorites]);
 
   if (!exercise) return null;
 
@@ -54,6 +54,8 @@ export default function ExerciseModal({ exercise, isOpen, onClose }) {
       }
 
       setIsFavorite(!isFavorite);
+      // Refresh favorites count after successful toggle
+      await refreshFavorites();
     } catch (error) {
       console.error("Error toggling favorite:", error);
     } finally {

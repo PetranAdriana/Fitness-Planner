@@ -2,7 +2,7 @@
 
 export default function Logo() {
   return (
-    <div className="w-10 h-10 bg-primary-600 dark:bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-200 hover:shadow-primary-500/20 hover:scale-105">
+    <div className="w-10 h-10 bg-primary-700 dark:bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-200 hover:shadow-primary-500/20 hover:scale-105">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
