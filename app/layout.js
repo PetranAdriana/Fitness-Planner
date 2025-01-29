@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "Fitness Planner",
@@ -13,6 +14,7 @@ export default function RootLayout({ children }) {
       <body className="antialiased min-h-screen bg-gray-50">
         <Navbar />
         {children}
+        <Toaster />
         <Footer />
       </body>
     </html>
