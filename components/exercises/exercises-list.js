@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import ExerciseModal from "./exercise-modal";
 import SearchBar from "./search-bar";
-import { 
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -12,33 +12,50 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { HeartIcon } from "@/components/icons";
+import { HeartIcon, EyeIconFilled } from "@/components/icons";
 import useStore from "@/lib/store";
-import { useShallow } from 'zustand/react/shallow';
+import { useShallow } from "zustand/react/shallow";
 
-const useExerciseStore = () => useStore(
-  useShallow(state => ({
-    favorites: state.favorites,
-    addToFavorites: state.addToFavorites,
-    removeFromFavorites: state.removeFromFavorites,
-  }))
-);
+const useExerciseStore = () =>
+  useStore(
+    useShallow((state) => ({
+      favorites: state.favorites,
+      isHydrated: state.isHydrated,
+      addToFavorites: state.addToFavorites,
+      removeFromFavorites: state.removeFromFavorites,
+      fetchFavorites: state.fetchFavorites,
+    }))
+  );
 
 export default function ExercisesList({ initialExercises = [] }) {
   const [exercises] = useState(initialExercises);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const { favorites, addToFavorites, removeFromFavorites } = useExerciseStore();
+  const {
+    favorites,
+    isHydrated,
+    addToFavorites,
+    removeFromFavorites,
+    fetchFavorites,
+  } = useExerciseStore();
 
-  const filteredExercises = exercises.filter((exercise) => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      exercise.name.toLowerCase().includes(searchLower) ||
-      exercise.target.toLowerCase().includes(searchLower) ||
-      exercise.equipment.toLowerCase().includes(searchLower) ||
-      exercise.bodyPart.toLowerCase().includes(searchLower)
-    );
-  });
+  useEffect(() => {
+    if (isHydrated) {
+      fetchFavorites();
+    }
+  }, [isHydrated, fetchFavorites]);
+
+  const filteredExercises = useMemo(() => {
+    return exercises.filter((exercise) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        exercise.name.toLowerCase().includes(searchLower) ||
+        exercise.target.toLowerCase().includes(searchLower) ||
+        exercise.equipment.toLowerCase().includes(searchLower) ||
+        exercise.bodyPart.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [exercises, searchQuery]);
 
   if (!exercises.length) {
     return (
@@ -49,6 +66,16 @@ export default function ExercisesList({ initialExercises = [] }) {
       </div>
     );
   }
+
+  const handleFavoriteClick = async (e, exercise) => {
+    e.stopPropagation();
+    const isFavorite = favorites?.some((fav) => fav.id === exercise.id);
+    if (isFavorite) {
+      await removeFromFavorites(exercise.id);
+    } else {
+      await addToFavorites(exercise);
+    }
+  };
 
   return (
     <>
@@ -64,21 +91,14 @@ export default function ExercisesList({ initialExercises = [] }) {
             className="group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-primary-500/50 dark:hover:border-primary-400/50 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 hover:-translate-y-1"
           >
             <div className="relative aspect-square bg-neutral-100 dark:bg-neutral-800">
-              <div 
+              <div
                 className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white/80 dark:bg-black/80 hover:bg-white dark:hover:bg-black transition-all duration-300 hover:scale-110 hover:shadow-md cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const isFavorite = favorites?.some(fav => fav.id === exercise.id);
-                  if (isFavorite) {
-                    removeFromFavorites(exercise.id);
-                  } else {
-                    addToFavorites(exercise);
-                  }
-                }}
+                onClick={(e) => handleFavoriteClick(e, exercise)}
               >
-                <HeartIcon 
+                <HeartIcon
                   className={`w-5 h-5 transition-all duration-300 ${
-                    favorites?.some(fav => fav.id === exercise.id)
+                    isHydrated &&
+                    favorites?.some((fav) => fav.id === exercise.id)
                       ? "fill-red-500 stroke-red-500 hover:fill-red-600 hover:stroke-red-600"
                       : "stroke-gray-600 dark:stroke-gray-400 hover:stroke-red-500 hover:scale-110"
                   }`}
@@ -100,63 +120,30 @@ export default function ExercisesList({ initialExercises = [] }) {
                   {exercise.target}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                    Equipment:
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-100 text-sm rounded-full">
+                    {exercise.bodyPart}
                   </span>
-                  <span className="text-sm capitalize text-neutral-700 dark:text-neutral-300">
+                  <span className="px-2 py-1 bg-accent-100 dark:bg-accent-900/50 text-accent-800 dark:text-accent-100 text-sm rounded-full">
                     {exercise.equipment}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                    Body Part:
-                  </span>
-                  <span className="text-sm capitalize text-neutral-700 dark:text-neutral-300">
-                    {exercise.bodyPart}
-                  </span>
-                </div>
               </CardContent>
-              <CardFooter className="justify-end">
-                <button
-                  className="p-2 rounded-lg text-primary-600 hover:text-primary-700 hover:bg-primary-50 dark:text-primary-400 dark:hover:text-primary-300 dark:hover:bg-primary-900/50 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedExercise(exercise);
-                  }}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                </button>
+              <CardFooter className="flex justify-end">
+                <EyeIconFilled className="w-5 h-5 text-gray-400 group-hover:text-primary-500 dark:text-gray-500 dark:group-hover:text-primary-400 transition-colors" />
               </CardFooter>
             </div>
           </Card>
         ))}
       </div>
-
-      <ExerciseModal
-        exercise={selectedExercise}
-        isOpen={!!selectedExercise}
-        onClose={() => setSelectedExercise(null)}
-      />
+      {selectedExercise && (
+        <ExerciseModal
+          exercise={selectedExercise}
+          isOpen={!!selectedExercise}
+          onClose={() => setSelectedExercise(null)}
+        />
+      )}
     </>
   );
 }
