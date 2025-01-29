@@ -1,97 +1,115 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import FavoritesList from "@/components/favorites/favorites-list";
+import { useEffect } from "react";
+import useStore from "@/lib/store";
+import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HeartIcon } from "@/components/icons";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { favorites, isLoading, error, fetchFavorites, removeFromFavorites } =
+    useStore();
 
-  const loadFavorites = async () => {
-    try {
-      const res = await fetch("/api/favorites", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch favorites");
-      }
-
-      const data = await res.json();
-      setFavorites(data);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-      setFavorites([]); // Set empty array on error
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRemove = async (exerciseId) => {
+    await removeFromFavorites(exerciseId);
   };
 
-  // Load favorites initially
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  // Set up interval to refresh favorites
-  useEffect(() => {
-    const interval = setInterval(loadFavorites, 5000); // Refresh every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <main className="min-h-screen bg-background pt-32">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary-700 dark:text-primary-300 mb-4">
-              My Favorite Exercises
-            </h1>
-            <p
-              className="relative w-[max-content] mx-auto font-mono text-xl text-neutral-600 dark:text-neutral-300 mb-12
-            before:absolute before:inset-0 before:animate-typewriter before:bg-background"
-            >
-              View and manage your favorite exercises
-            </p>
-          </div>
-
-          {isLoading ? (
-            <div className="flex justify-center items-center min-h-[200px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 dark:border-primary-400"></div>
-            </div>
-          ) : favorites.length > 0 ? (
-            <div className="bg-card rounded-xl p-6 shadow-sm">
-              <FavoritesList
-                favorites={favorites}
-                onFavoriteRemoved={loadFavorites}
-              />
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-card rounded-xl shadow-sm">
-              <svg
-                className="w-16 h-16 mx-auto text-neutral-300 dark:text-neutral-600 mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-              <h3 className="text-xl font-semibold text-primary-700 dark:text-primary-300 mb-2">
-                No Favorite Exercises Yet
-              </h3>
-              <p className="text-neutral-600 dark:text-neutral-400 mb-6">
-                Start adding exercises to your favorites to see them here
-              </p>
-            </div>
-          )}
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 pt-40">
+        <div className="text-center">
+          <p className="text-red-500 text-lg">{error}</p>
+          <button
+            onClick={fetchFavorites}
+            className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600"
+          >
+            Try Again
+          </button>
         </div>
       </div>
-    </main>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 pt-32">
+        <div className="text-center">
+          <p className="text-lg">Loading your favorites...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (favorites.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8 pt-32">
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Favorites</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <HeartIcon className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-500">
+                You have not added any favorites yet.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8 pt-40">
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Favorites</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {favorites.map((exercise) => (
+              <div
+                key={exercise.id}
+                className="group relative bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
+              >
+                <div className="relative aspect-square mb-4">
+                  <Image
+                    src={exercise.gifUrl}
+                    alt={exercise.name}
+                    fill
+                    className="object-contain rounded-md"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-lg capitalize">
+                    {exercise.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 text-sm rounded-md capitalize">
+                      {exercise.target}
+                    </span>
+                    <span className="px-2 py-1 bg-accent-100 dark:bg-accent-900 text-accent-800 dark:text-accent-200 text-sm rounded-md capitalize">
+                      {exercise.bodyPart}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleRemove(exercise.id)}
+                    className="w-full mt-2 flex items-center justify-center px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+                  >
+                    <HeartIcon className="w-5 h-5 mr-2 fill-current" />
+                    Remove from Favorites
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

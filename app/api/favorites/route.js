@@ -1,7 +1,23 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+// Use a more robust storage solution with a lock mechanism
 let userFavorites = new Map();
+const locks = new Map();
+
+// Helper function to acquire a lock
+const acquireLock = (userId) => {
+  if (locks.get(userId)) {
+    return false;
+  }
+  locks.set(userId, true);
+  return true;
+};
+
+// Helper function to release a lock
+const releaseLock = (userId) => {
+  locks.delete(userId);
+};
 
 export async function GET() {
   try {
@@ -26,15 +42,24 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("authToken");
+
+  if (!authToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = authToken.value;
+
+  // Try to acquire lock
+  if (!acquireLock(userId)) {
+    return NextResponse.json(
+      { error: "Operation in progress, please try again" },
+      { status: 429 }
+    );
+  }
+
   try {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("authToken");
-
-    if (!authToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = authToken.value;
     const { exercise } = await request.json();
 
     if (!exercise) {
@@ -46,31 +71,52 @@ export async function POST(request) {
 
     let userFavoritesList = userFavorites.get(userId) || [];
 
-    if (!userFavoritesList.some((fav) => fav.id === exercise.id)) {
-      userFavoritesList = [...userFavoritesList, exercise];
-      userFavorites.set(userId, userFavoritesList);
+    // Check if exercise already exists
+    if (userFavoritesList.some((fav) => fav.id === exercise.id)) {
+      return NextResponse.json(
+        { message: "Exercise already in favorites" },
+        { status: 200 }
+      );
     }
 
-    return NextResponse.json(userFavoritesList);
+    // Add to favorites
+    userFavoritesList = [...userFavoritesList, exercise];
+    userFavorites.set(userId, userFavoritesList);
+
+    return NextResponse.json(
+      { message: "Exercise added to favorites", favorites: userFavoritesList },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error adding to favorites:", error);
     return NextResponse.json(
       { error: "Failed to add to favorites" },
       { status: 500 }
     );
+  } finally {
+    releaseLock(userId);
   }
 }
 
 export async function DELETE(request) {
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("authToken");
+
+  if (!authToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = authToken.value;
+
+  // Try to acquire lock
+  if (!acquireLock(userId)) {
+    return NextResponse.json(
+      { error: "Operation in progress, please try again" },
+      { status: 429 }
+    );
+  }
+
   try {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("authToken");
-
-    if (!authToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = authToken.value;
     const { exerciseId } = await request.json();
 
     if (!exerciseId) {
@@ -81,17 +127,30 @@ export async function DELETE(request) {
     }
 
     let userFavoritesList = userFavorites.get(userId) || [];
-    userFavoritesList = userFavoritesList.filter(
-      (exercise) => exercise.id !== exerciseId
-    );
+
+    // Check if exercise exists before removing
+    if (!userFavoritesList.some((fav) => fav.id === exerciseId)) {
+      return NextResponse.json(
+        { message: "Exercise not in favorites" },
+        { status: 200 }
+      );
+    }
+
+    // Remove from favorites
+    userFavoritesList = userFavoritesList.filter((fav) => fav.id !== exerciseId);
     userFavorites.set(userId, userFavoritesList);
 
-    return NextResponse.json(userFavoritesList);
+    return NextResponse.json(
+      { message: "Exercise removed from favorites", favorites: userFavoritesList },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error removing from favorites:", error);
     return NextResponse.json(
       { error: "Failed to remove from favorites" },
       { status: 500 }
     );
+  } finally {
+    releaseLock(userId);
   }
 }
